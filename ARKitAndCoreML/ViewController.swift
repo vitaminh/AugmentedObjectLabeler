@@ -3,6 +3,7 @@
 //  ARKitAndCoreML
 //
 //  Created by HDO on 1/21/19.
+//  Based on implementation by Hanley Weng: https://github.com/hanleyweng/CoreML-in-ARKit
 //  Copyright © 2019 Henry Do. All rights reserved.
 //
 
@@ -16,6 +17,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     // Scene
     @IBOutlet var sceneView: ARSCNView!
     var latestPrediction : String = "..."   // latest CoreML prediction
+    let bubbleDepth : Float = 0.01  // 'depth' of 3D text
     
     // CoreML
     var visionRequests = [VNRequest]()
@@ -39,6 +41,10 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
         // Enable Default Lighting
         sceneView.autoenablesDefaultLighting = true
+        
+        // Tap Gesture Recognizer
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.handleTap(gestureRecognize:)))
+        view.addGestureRecognizer(tapGesture)
         
         // Set up Vision Model
         guard let selectedModel = try? VNCoreMLModel(for: Inceptionv3().model) else {
@@ -144,6 +150,69 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         }
     }
 
+    // MARK: - Interaction
+    @objc func handleTap(gestureRecognize: UITapGestureRecognizer) {
+        // HIT TEST : REAL WORLD
+        // Get screen center
+        let screenCenter : CGPoint = CGPoint(x: self.sceneView.bounds.midX, y: self.sceneView.bounds.midY)
+        
+        // Alternatively, we could use '.existingPlaneUsingExtent' for more grounded hit-test-points.
+        let arHitTestResults : [ARHitTestResult] = sceneView.hitTest(screenCenter, types: [.featurePoint])
+        
+        if let closestResult = arHitTestResults.first {
+            // Get coordinates of HitTest
+            let transform : matrix_float4x4 = closestResult.worldTransform
+            let worldCoord : SCNVector3 = SCNVector3Make(transform.columns.3.x, transform.columns.3.y, transform.columns.3.z)
+            
+            // Create 3D Text
+            let node : SCNNode = createNewBubbleParentNode(latestPrediction)
+            sceneView.scene.rootNode.addChildNode(node)
+            node.position = worldCoord
+        }
+    }
+    
+    func createNewBubbleParentNode(_ text : String) -> SCNNode {
+        // Warning: Creating 3D Text is susceptible to crashing.
+        // To reduce chances of crashing; reduce number of polygons, letters, smoothness, etc.
+        
+        // Text Billboard Constraint
+        let billboardConstraint = SCNBillboardConstraint()
+        billboardConstraint.freeAxes = SCNBillboardAxis.Y
+        
+        // Bubble-Text
+        let bubble = SCNText(string: text, extrusionDepth: CGFloat(bubbleDepth))
+        var font = UIFont(name: "Futura", size: 0.2)
+        font = font?.withTraits(traits: .traitBold)
+        bubble.font = font
+//        bubble.alignmentMode = kCAAlignmentCenter
+        bubble.firstMaterial?.diffuse.contents = UIColor.orange
+        bubble.firstMaterial?.specular.contents = UIColor.white
+        bubble.firstMaterial?.isDoubleSided = true
+        // setting bubble.flatness too low can cause crashes
+        bubble.chamferRadius = CGFloat(bubbleDepth)
+        
+        // Bubble Node
+        let (minBound, maxBound) = bubble.boundingBox
+        let bubbleNode = SCNNode(geometry: bubble)
+        // Center Node - to Center-Bottom point
+        bubbleNode.pivot = SCNMatrix4MakeTranslation((maxBound.x - minBound.x)/2, minBound.y, bubbleDepth/2)
+        // Reduce default text size
+        bubbleNode.scale = SCNVector3Make(0.2, 0.2, 0.2)
+        
+        // Center Point Node
+        let sphere = SCNSphere(radius: 0.005)
+        sphere.firstMaterial?.diffuse.contents = UIColor.cyan
+        let sphereNode = SCNNode(geometry: sphere)
+        
+        // Bubble parent node
+        let bubbleNodeParent = SCNNode()
+        bubbleNodeParent.addChildNode(bubbleNode)
+        bubbleNodeParent.addChildNode(sphereNode)
+        bubbleNodeParent.constraints = [billboardConstraint]
+        
+        return bubbleNodeParent
+    }
+    
     // MARK: - Status Bar: Hide
     override var prefersStatusBarHidden: Bool {
         return true
@@ -173,5 +242,13 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     func sessionInterruptionEnded(_ session: ARSession) {
         // Reset tracking and/or remove existing anchors if consistent tracking is required
         
+    }
+}
+
+extension UIFont {
+    // Based on: https://stackoverflow.com/questions/4713236/how-do-i-set-bold-and-italic-on-uilabel-of-iphone-ipad
+    func withTraits(traits:UIFontDescriptor.SymbolicTraits...) -> UIFont {
+        let descriptor = self.fontDescriptor.withSymbolicTraits(UIFontDescriptor.SymbolicTraits(traits))
+        return UIFont(descriptor: descriptor!, size: 0)
     }
 }
