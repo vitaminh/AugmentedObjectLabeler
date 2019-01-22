@@ -13,7 +13,14 @@ import ARKit
 import Vision
 
 class ViewController: UIViewController, ARSCNViewDelegate {
-
+    
+    // Actions
+    @IBAction func clearButtonPressed(_ sender: Any) {
+        sceneView.scene.rootNode.enumerateChildNodes { (node, stop) in
+            node.removeFromParentNode()
+        }
+    }
+    
     // Scene
     @IBOutlet var sceneView: ARSCNView!
     var latestPrediction : String = "..."   // latest CoreML prediction
@@ -181,11 +188,11 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
         // Bubble-Text
         let bubble = SCNText(string: text, extrusionDepth: CGFloat(bubbleDepth))
-        var font = UIFont(name: "Futura", size: 0.2)
+        var font = UIFont(name: "Arial", size: 0.3)
         font = font?.withTraits(traits: .traitBold)
         bubble.font = font
 //        bubble.alignmentMode = kCAAlignmentCenter
-        bubble.firstMaterial?.diffuse.contents = UIColor.orange
+        bubble.firstMaterial?.diffuse.contents = UIColor.yellow
         bubble.firstMaterial?.specular.contents = UIColor.white
         bubble.firstMaterial?.isDoubleSided = true
         // setting bubble.flatness too low can cause crashes
