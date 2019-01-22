@@ -29,13 +29,23 @@
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mqP-OL-eQO">
-                                <rect key="frame" x="319" y="20" width="131" height="40"/>
+                                <rect key="frame" x="20" y="20" width="131" height="40"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle0"/>
                                 <state key="normal" title="Clear"/>
                                 <connections>
                                     <action selector="clearButtonPressed:" destination="BV1-FR-VrT" eventType="touchUpInside" id="9rN-n0-2Q2"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6JR-8V-euM">
+                                <rect key="frame" x="573" y="20" width="175" height="40"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleTitle0"/>
+                                <state key="normal" title="EN"/>
+                                <connections>
+                                    <action selector="changeLanguage:" destination="BV1-FR-VrT" eventType="touchUpInside" id="qAC-Hi-NRk"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -50,6 +60,7 @@
                     </view>
                     <connections>
                         <outlet property="debugTextView" destination="Umv-Qg-zTf" id="Fz1-UY-1CN"/>
+                        <outlet property="languageButton" destination="6JR-8V-euM" id="NdZ-qT-ewM"/>
                         <outlet property="sceneView" destination="BrB-h1-WRS" id="5nT-qQ-ynl"/>
                     </connections>
                 </viewController>

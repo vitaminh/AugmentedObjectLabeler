@@ -13,6 +13,7 @@ import ARKit
 import Vision
 
 class ViewController: UIViewController, ARSCNViewDelegate {
+    var languageIsEnglish: Bool = true
     
     // Actions
     @IBAction func clearButtonPressed(_ sender: Any) {
@@ -20,6 +21,14 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             node.removeFromParentNode()
         }
     }
+    
+    @IBAction func changeLanguage(_ sender: Any) {
+        languageIsEnglish = !languageIsEnglish
+        let newText = languageIsEnglish ? "EN" : "ES"
+        languageButton.setTitle(newText, for: UIControl.State.normal)
+    }
+    
+    @IBOutlet weak var languageButton: UIButton!
     
     // Scene
     @IBOutlet var sceneView: ARSCNView!
@@ -33,6 +42,9 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // Google Translate
+        SwiftGoogleTranslate.shared.start(with: "AIzaSyDimBFS95IGRDm_cRH9RSfoeUXE_MFmSyo")
         
         // Set the view's delegate
         sceneView.delegate = self
@@ -68,7 +80,6 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
         // Begin loop to update CoreML
         loopCoreMLUpdate()
-        
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -101,15 +112,15 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         }
         
         // Get classifications
-        let classifications = observations[0...1]   // top 2 results
+        let classifications = observations[0...2]   // top 3 results
             .compactMap({$0 as? VNClassificationObservation})
             .map({ "\($0.identifier) \(String(format:"- %.2f", $0.confidence))"})
             .joined(separator: "\n")
         
         DispatchQueue.main.async {
             // print classifications
-            print(classifications)
-            print("--")
+            // print(classifications)
+            // print("--")
             
             // Display debug text on screen
             var debugText: String = ""
@@ -171,10 +182,28 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             let transform : matrix_float4x4 = closestResult.worldTransform
             let worldCoord : SCNVector3 = SCNVector3Make(transform.columns.3.x, transform.columns.3.y, transform.columns.3.z)
             
+            // Create text in chosen language
+            let asyncGroup = DispatchGroup()
+            var bubbleText: String = ""
+            if (!languageIsEnglish) {
+                asyncGroup.enter()
+                SwiftGoogleTranslate.shared.translate(latestPrediction, "es", "en") { (text, error) in
+                    bubbleText = text!
+                    asyncGroup.leave()
+                }
+            }
+            else {
+                asyncGroup.enter()
+                bubbleText = latestPrediction
+                asyncGroup.leave()
+            }
+            asyncGroup.wait()
+            
             // Create 3D Text
-            let node : SCNNode = createNewBubbleParentNode(latestPrediction)
+            let node : SCNNode = createNewBubbleParentNode(bubbleText)
             sceneView.scene.rootNode.addChildNode(node)
             node.position = worldCoord
+
         }
     }
     
@@ -188,7 +217,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
         // Bubble-Text
         let bubble = SCNText(string: text, extrusionDepth: CGFloat(bubbleDepth))
-        var font = UIFont(name: "Arial", size: 0.3)
+        var font = UIFont(name: "Arial", size: 0.35)
         font = font?.withTraits(traits: .traitBold)
         bubble.font = font
 //        bubble.alignmentMode = kCAAlignmentCenter
