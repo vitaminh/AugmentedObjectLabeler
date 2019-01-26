@@ -3,7 +3,7 @@
 //  ARKitAndCoreML
 //
 //  Created by HDO on 1/21/19.
-//  Based on implementation by Hanley Weng: https://github.com/hanleyweng/CoreML-in-ARKit
+//  Based on ARKit and CoreML implementation by Hanley Weng: https://github.com/hanleyweng/CoreML-in-ARKit
 //  Copyright © 2019 Henry Do. All rights reserved.
 //
 
@@ -23,6 +23,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     }
     
     @IBAction func changeLanguage(_ sender: Any) {
+        // Set language for future objects
         languageIsEnglish = !languageIsEnglish
         let newText = languageIsEnglish ? "EN" : "ES"
         languageButton.setTitle(newText, for: UIControl.State.normal)
@@ -32,8 +33,8 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     
     // Scene
     @IBOutlet var sceneView: ARSCNView!
-    var latestPrediction : String = "..."   // latest CoreML prediction
-    let bubbleDepth : Float = 0.01  // 'depth' of 3D text
+    var latestPrediction : String = ""   // latest CoreML prediction
+    let bubbleDepth : Float = 0.02  // 'depth' of 3D text
     
     // CoreML
     var visionRequests = [VNRequest]()
@@ -44,7 +45,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         super.viewDidLoad()
         
         // Google Translate
-        SwiftGoogleTranslate.shared.start(with: "AIzaSyDimBFS95IGRDm_cRH9RSfoeUXE_MFmSyo")
+        SwiftGoogleTranslate.shared.start(with: Secrets.apiKey)
         
         // Set the view's delegate
         sceneView.delegate = self
@@ -118,9 +119,6 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             .joined(separator: "\n")
         
         DispatchQueue.main.async {
-            // print classifications
-            // print(classifications)
-            // print("--")
             
             // Display debug text on screen
             var debugText: String = ""
@@ -169,6 +167,28 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     }
 
     // MARK: - Interaction
+    
+    // Get text to display
+    func getBubbleText(_ text: String) -> String {
+        // Create text in chosen language
+        let asyncGroup = DispatchGroup()
+        var bubbleText: String = ""
+        if (!languageIsEnglish) {
+            asyncGroup.enter()
+            SwiftGoogleTranslate.shared.translate(text, "es", "en") { (text, error) in
+                bubbleText = text!
+                asyncGroup.leave()
+            }
+        }
+        else {
+            asyncGroup.enter()
+            bubbleText = latestPrediction
+            asyncGroup.leave()
+        }
+        asyncGroup.wait()
+        return bubbleText
+    }
+    
     @objc func handleTap(gestureRecognize: UITapGestureRecognizer) {
         // HIT TEST : REAL WORLD
         // Get screen center
@@ -183,21 +203,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             let worldCoord : SCNVector3 = SCNVector3Make(transform.columns.3.x, transform.columns.3.y, transform.columns.3.z)
             
             // Create text in chosen language
-            let asyncGroup = DispatchGroup()
-            var bubbleText: String = ""
-            if (!languageIsEnglish) {
-                asyncGroup.enter()
-                SwiftGoogleTranslate.shared.translate(latestPrediction, "es", "en") { (text, error) in
-                    bubbleText = text!
-                    asyncGroup.leave()
-                }
-            }
-            else {
-                asyncGroup.enter()
-                bubbleText = latestPrediction
-                asyncGroup.leave()
-            }
-            asyncGroup.wait()
+            let bubbleText = getBubbleText(latestPrediction)
             
             // Create 3D Text
             let node : SCNNode = createNewBubbleParentNode(bubbleText)
@@ -207,20 +213,12 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         }
     }
     
-    func createNewBubbleParentNode(_ text : String) -> SCNNode {
-        // Warning: Creating 3D Text is susceptible to crashing.
-        // To reduce chances of crashing; reduce number of polygons, letters, smoothness, etc.
-        
-        // Text Billboard Constraint
-        let billboardConstraint = SCNBillboardConstraint()
-        billboardConstraint.freeAxes = SCNBillboardAxis.Y
-        
+    func createBubbleNode(_ text: String) -> SCNNode {
         // Bubble-Text
         let bubble = SCNText(string: text, extrusionDepth: CGFloat(bubbleDepth))
-        var font = UIFont(name: "Arial", size: 0.35)
+        var font = UIFont(name: "Arial", size: 0.15)
         font = font?.withTraits(traits: .traitBold)
         bubble.font = font
-//        bubble.alignmentMode = kCAAlignmentCenter
         bubble.firstMaterial?.diffuse.contents = UIColor.yellow
         bubble.firstMaterial?.specular.contents = UIColor.white
         bubble.firstMaterial?.isDoubleSided = true
@@ -234,6 +232,20 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         bubbleNode.pivot = SCNMatrix4MakeTranslation((maxBound.x - minBound.x)/2, minBound.y, bubbleDepth/2)
         // Reduce default text size
         bubbleNode.scale = SCNVector3Make(0.2, 0.2, 0.2)
+        
+        return bubbleNode
+    }
+    
+    func createNewBubbleParentNode(_ text : String) -> SCNNode {
+        // Warning: Creating 3D Text is susceptible to crashing.
+        // To reduce chances of crashing; reduce number of polygons, letters, smoothness, etc.
+        
+        // Text Billboard Constraint
+        let billboardConstraint = SCNBillboardConstraint()
+        billboardConstraint.freeAxes = SCNBillboardAxis.Y
+        
+        // Bubble-Text
+        let bubbleNode = createBubbleNode(text)
         
         // Center Point Node
         let sphere = SCNSphere(radius: 0.005)

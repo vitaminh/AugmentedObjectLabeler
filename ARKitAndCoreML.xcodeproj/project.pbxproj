@@ -16,6 +16,7 @@
 		5F83EFDA21F65CA4000059F6 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5F83EFD821F65CA4000059F6 /* LaunchScreen.storyboard */; };
 		5F83EFE521F65CA4000059F6 /* ARKitAndCoreMLTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F83EFE421F65CA4000059F6 /* ARKitAndCoreMLTests.swift */; };
 		5F83EFF021F65CA4000059F6 /* ARKitAndCoreMLUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F83EFEF21F65CA4000059F6 /* ARKitAndCoreMLUITests.swift */; };
+		5FF9BCFA21FC3E760009384B /* secrets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FF9BCF921FC3E760009384B /* secrets.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -51,6 +52,7 @@
 		5F83EFEB21F65CA4000059F6 /* ARKitAndCoreMLUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ARKitAndCoreMLUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		5F83EFEF21F65CA4000059F6 /* ARKitAndCoreMLUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARKitAndCoreMLUITests.swift; sourceTree = "<group>"; };
 		5F83EFF121F65CA4000059F6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		5FF9BCF921FC3E760009384B /* secrets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = secrets.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -104,6 +106,7 @@
 				5F7C4D7021F6E7A1004C103D /* SwiftGoogleTranslate.swift */,
 				5F83EFCD21F65CA3000059F6 /* AppDelegate.swift */,
 				5F83EFD121F65CA3000059F6 /* ViewController.swift */,
+				5FF9BCF921FC3E760009384B /* secrets.swift */,
 				5F83EFD321F65CA3000059F6 /* Main.storyboard */,
 				5F83EFD621F65CA4000059F6 /* Assets.xcassets */,
 				5F83EFD821F65CA4000059F6 /* LaunchScreen.storyboard */,
@@ -264,6 +267,7 @@
 			files = (
 				5F83EFD221F65CA3000059F6 /* ViewController.swift in Sources */,
 				5F7C4D7121F6E7A1004C103D /* SwiftGoogleTranslate.swift in Sources */,
+				5FF9BCFA21FC3E760009384B /* secrets.swift in Sources */,
 				5F69AD8B21F69FC20075D17A /* Inceptionv3.mlmodel in Sources */,
 				5F83EFCE21F65CA3000059F6 /* AppDelegate.swift in Sources */,
 			);
