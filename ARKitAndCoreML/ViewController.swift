@@ -170,9 +170,10 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     
     // Get text to display
     func getBubbleText(_ text: String) -> String {
+        var bubbleText: String = ""
+
         // Create text in chosen language
         let asyncGroup = DispatchGroup()
-        var bubbleText: String = ""
         if (!languageIsEnglish) {
             asyncGroup.enter()
             SwiftGoogleTranslate.shared.translate(text, "es", "en") { (text, error) in
@@ -181,9 +182,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             }
         }
         else {
-            asyncGroup.enter()
             bubbleText = latestPrediction
-            asyncGroup.leave()
         }
         asyncGroup.wait()
         return bubbleText
