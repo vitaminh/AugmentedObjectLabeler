@@ -177,7 +177,13 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         if (!languageIsEnglish) {
             asyncGroup.enter()
             SwiftGoogleTranslate.shared.translate(text, "es", "en") { (text, error) in
-                bubbleText = text!
+                if let translatedText = text {
+                    bubbleText = translatedText
+                }
+                else {
+                    print(error)
+                    print("Text not translated")
+                }
                 asyncGroup.leave()
             }
         }
