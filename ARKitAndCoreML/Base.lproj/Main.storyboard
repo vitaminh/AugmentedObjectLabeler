@@ -23,7 +23,7 @@
                             </arscnView>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" text="Lorem ipsum" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="Umv-Qg-zTf">
                                 <rect key="frame" x="70" y="913" width="628" height="91"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxY="YES"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
@@ -39,11 +39,11 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6JR-8V-euM">
-                                <rect key="frame" x="573" y="20" width="175" height="40"/>
+                                <rect key="frame" x="281" y="20" width="467" height="40"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle0"/>
-                                <state key="normal" title="EN"/>
+                                <state key="normal" title="English"/>
                                 <connections>
                                     <action selector="changeLanguage:" destination="BV1-FR-VrT" eventType="touchUpInside" id="qAC-Hi-NRk"/>
                                 </connections>
@@ -62,11 +62,47 @@
                         <outlet property="debugTextView" destination="Umv-Qg-zTf" id="Fz1-UY-1CN"/>
                         <outlet property="languageButton" destination="6JR-8V-euM" id="NdZ-qT-ewM"/>
                         <outlet property="sceneView" destination="BrB-h1-WRS" id="5nT-qQ-ynl"/>
+                        <segue destination="hH0-Te-Oa1" kind="popoverPresentation" identifier="languagePickerSegue" popoverAnchorView="6JR-8V-euM" id="z94-IV-gL0">
+                            <popoverArrowDirection key="popoverArrowDirection" up="YES" down="YES" left="YES" right="YES"/>
+                        </segue>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="SZV-WD-TEh" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="52.34375" y="25.78125"/>
+        </scene>
+        <!--Language Picker View Controller-->
+        <scene sceneID="Nju-vP-T57">
+            <objects>
+                <viewController id="hH0-Te-Oa1" customClass="LanguagePickerViewController" customModule="ARKitAndCoreML" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Fhz-04-Cod">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <pickerView contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="GQx-j5-6EC">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="422"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                            </pickerView>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="DgD-Ea-6v8">
+                                <rect key="frame" x="138" y="430" width="44" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Select"/>
+                                <connections>
+                                    <segue destination="SJ1-Pj-zrA" kind="unwind" unwindAction="unwindToThisViewWithSender:" id="Lh0-S0-lzg"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <viewLayoutGuide key="safeArea" id="bPE-cu-1YG"/>
+                    </view>
+                    <connections>
+                        <outlet property="languagePickerView" destination="GQx-j5-6EC" id="qSQ-h9-dzS"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="rMR-Ml-Zze" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <exit id="SJ1-Pj-zrA" userLabel="Exit" sceneMemberID="exit"/>
+            </objects>
+            <point key="canvasLocation" x="783.59375" y="25.78125"/>
         </scene>
     </scenes>
 </document>

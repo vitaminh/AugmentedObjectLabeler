@@ -14,6 +14,7 @@ import Vision
 
 class ViewController: UIViewController, ARSCNViewDelegate {
     var languageIsEnglish: Bool = true
+    var selectedLanguage = ["English", "en"]
     
     // Actions
     @IBAction func clearButtonPressed(_ sender: Any) {
@@ -23,10 +24,28 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     }
     
     @IBAction func changeLanguage(_ sender: Any) {
+        performSegue(withIdentifier: "languagePickerSegue", sender: nil)
+    }
+    
+    // Segues
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if (segue.identifier == "languagePickerSegue") {
+            let destination = segue.destination as! LanguagePickerViewController
+            destination.selectedLanguage = selectedLanguage
+            print(destination.selectedLanguage)
+        }
+    }
+    
+    @IBAction func unwindToThisView(sender: UIStoryboardSegue) {
+        if let popOverViewController = sender.source as? LanguagePickerViewController {
+            selectedLanguage = popOverViewController.selectedLanguage
+        }
+        setLanguage()
+    }
+    
+    func setLanguage() {
         // Set language for future objects
-        languageIsEnglish = !languageIsEnglish
-        let currentLanguage = languageIsEnglish ? "EN" : "ES"
-        languageButton.setTitle(currentLanguage, for: UIControl.State.normal)
+        languageButton.setTitle(selectedLanguage[0], for: UIControl.State.normal)
         
         // Change text of existing objects
         sceneView.scene.rootNode.enumerateChildNodes { (node, stop) in
@@ -34,22 +53,19 @@ class ViewController: UIViewController, ARSCNViewDelegate {
                 return
             }
             var newNodeText = node.name
-            if (!languageIsEnglish) {
-                newNodeText = getBubbleText(node.name ?? "")
+            if (selectedLanguage[1] != "en") {
+                newNodeText = getBubbleText(node.name ?? "", language: selectedLanguage[1])
             }
             
             // Create a new bubble node text object to display
             let newBubbleNode = createBubbleNode(newNodeText ?? "")
-            for element in node.childNodes {
-                print(element)
-            }
             
             // Replace old node text in the array on the parent node
             node.replaceChildNode(node.childNodes[0], with: newBubbleNode)
-            
         }
     }
     
+    // Outlets
     @IBOutlet weak var languageButton: UIButton!
     
     // Scene
@@ -64,6 +80,9 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // Initialize language button
+        languageButton.setTitle(selectedLanguage[0], for: UIControl.State.normal)
         
         // Google Translate
         SwiftGoogleTranslate.shared.start(with: Secrets.apiKey)
@@ -190,14 +209,14 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     // MARK: - Interaction
     
     // Get text to display
-    func getBubbleText(_ text: String) -> String {
+    func getBubbleText(_ text: String, language: String) -> String {
         var bubbleText: String = ""
 
         // Create text in chosen language
         let asyncGroup = DispatchGroup()
-        if (!languageIsEnglish) {
+        if (selectedLanguage[1] != "en") {
             asyncGroup.enter()
-            SwiftGoogleTranslate.shared.translate(text, "es", "en") { (text, error) in
+            SwiftGoogleTranslate.shared.translate(text, language, "en") { (text, error) in
                 if let translatedText = text {
                     bubbleText = translatedText
                 }
@@ -229,7 +248,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             let worldCoord : SCNVector3 = SCNVector3Make(transform.columns.3.x, transform.columns.3.y, transform.columns.3.z)
             
             // Create text in chosen language
-            let bubbleText = getBubbleText(latestPrediction)
+            let bubbleText = getBubbleText(latestPrediction, language: selectedLanguage[1])
             
             // Create 3D Text
             let node : SCNNode = createNewBubbleParentNode(bubbleText)
