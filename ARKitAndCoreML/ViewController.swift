@@ -25,8 +25,29 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     @IBAction func changeLanguage(_ sender: Any) {
         // Set language for future objects
         languageIsEnglish = !languageIsEnglish
-        let newText = languageIsEnglish ? "EN" : "ES"
-        languageButton.setTitle(newText, for: UIControl.State.normal)
+        let currentLanguage = languageIsEnglish ? "EN" : "ES"
+        languageButton.setTitle(currentLanguage, for: UIControl.State.normal)
+        
+        // Change text of existing objects
+        sceneView.scene.rootNode.enumerateChildNodes { (node, stop) in
+            if (node.childNodes.count == 0) {
+                return
+            }
+            var newNodeText = node.name
+            if (!languageIsEnglish) {
+                newNodeText = getBubbleText(node.name ?? "")
+            }
+            
+            // Create a new bubble node text object to display
+            let newBubbleNode = createBubbleNode(newNodeText ?? "")
+            for element in node.childNodes {
+                print(element)
+            }
+            
+            // Replace old node text in the array on the parent node
+            node.replaceChildNode(node.childNodes[0], with: newBubbleNode)
+            
+        }
     }
     
     @IBOutlet weak var languageButton: UIButton!
@@ -181,7 +202,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
                     bubbleText = translatedText
                 }
                 else {
-                    print(error)
+                    print(error as Any)
                     print("Text not translated")
                 }
                 asyncGroup.leave()
@@ -212,6 +233,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             
             // Create 3D Text
             let node : SCNNode = createNewBubbleParentNode(bubbleText)
+            node.name = latestPrediction    // keep track of node's original name in English for translation
             sceneView.scene.rootNode.addChildNode(node)
             node.position = worldCoord
 
