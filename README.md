@@ -13,3 +13,9 @@ Switching languages changes the language of all currently displayed labels
 Based on ARKit and CoreML implementation by Hanley Weng: https://github.com/hanleyweng/CoreML-in-ARKit
 
 Also uses SwiftGoogleTranslate : https://github.com/maximbilan/SwiftGoogleTranslate
+
+### Bugs
+
+Image recognition is inconsistent, though often hilariously so:
+
+![png of cat being mistaken for a doormat](Public/doormat.png)
