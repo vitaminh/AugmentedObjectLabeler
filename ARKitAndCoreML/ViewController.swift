@@ -4,7 +4,6 @@
 //
 //  Created by HDO on 1/21/19.
 //  Based on ARKit and CoreML implementation by Hanley Weng: https://github.com/hanleyweng/CoreML-in-ARKit
-//  Copyright © 2019 Henry Do. All rights reserved.
 //
 
 import UIKit
